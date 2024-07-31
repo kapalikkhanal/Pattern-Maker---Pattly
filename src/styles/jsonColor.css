@@ -1,0 +1,30 @@
+.key {
+  color: #E879F9;
+}
+
+.string {
+  color: #A78BFA;
+}
+
+.number {
+  color: #F9A825;
+}
+
+.boolean {
+  color: #F78C6C;
+}
+
+.null {
+  color: #FF5370;
+}
+
+.blinker::after {
+  content: '|';
+  animation: blink 1s step-end infinite;
+}
+
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
+}
