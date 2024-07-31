@@ -1,14 +1,14 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { Rnd } from 'react-rnd';
 
-const DraggableShape = ({ shapePath, shapeColor, shapeSize, position, onDragStop, isDragging, onDragStart, rotation }) => {
+const DraggableShape = ({ shapePath, shapeColor, shapeSize, position, onDragStop, isDragging, onDragStart, rotation, rects }) => {
     const centerX = 50;
     const centerY = 50;
     const lineLength = 10;
 
     return (
         <Rnd
-            position={position}
+            // position={position}
             onDragStart={onDragStart}
             onDragStop={(e, d) => onDragStop(d.x, d.y)}
             enableResizing={false}
@@ -17,9 +17,10 @@ const DraggableShape = ({ shapePath, shapeColor, shapeSize, position, onDragStop
                 width={shapeSize}
                 height={shapeSize}
                 viewBox="0 0 100 100"
-                style={{ cursor: 'move', transform: `rotate(${rotation}deg)`, transformOrigin: 'center' }}
+                style={{ cursor: 'move' }}
             >
-                <path d={shapePath} fill={shapeColor} stroke="none" />
+                {/* <path d={shapePath} fill={shapeColor} stroke="none" /> */}
+                {rects}
                 {isDragging && (
                     <>
                         <line x1={centerX} y1={centerY} x2={centerX - lineLength} y2={centerY} stroke="white" strokeWidth="0.1" />
@@ -33,17 +34,18 @@ const DraggableShape = ({ shapePath, shapeColor, shapeSize, position, onDragStop
     );
 };
 
-const WaveGenerator = ({
+const ChessGenerator = ({
     blobColor,
-    size,
     backgroundColor,
     complexity,
     gravity,
-    canvasSize = { width: 900, height: 675 }
+    size,
+    canvasSize = { width: 900, height: 675 } // Default canvas size
 }) => {
-    const shapeSize = Math.min(1000, size * 100);
+    // console.log(blobColor, backgroundColor)
+    const shapeSize = Math.min(1000, size * 20);
     const { width, height } = canvasSize;
-    const [rotation, setRotation] = useState(0);
+    const [rotation, setRotation] = useState(false);
     const containerWidth = width / 1.8;
     const containerHeight = height / 1.8;
 
@@ -56,24 +58,42 @@ const WaveGenerator = ({
 
     const containerRef = useRef(null);
 
-    const getWavePath = useCallback(() => {
-        const waveLength = 100 / complexity;
-        let d = 'M 0 50 ';
-        for (let x = 0; x <= 100; x++) {
-            const y = 50 + gravity * Math.sin((x / waveLength) * 2 * Math.PI);
-            d += `L ${x} ${y} `;
+    const getChessPatternPath = useCallback(() => {
+        const gridSize = complexity; // Grid size based on complexity
+        const cellSize = gravity; // Size of each cell
+
+        let rects = [];
+        for (let i = 0; i < gridSize; i++) {
+            for (let j = 0; j < gridSize; j++) {
+                const x = j * cellSize;
+                const y = i * cellSize;
+                const baseColor = (i + j) % 2 === 0 ? blobColor : backgroundColor; // Base color based on the pattern
+                const fillColor = rotation ? baseColor : (baseColor === blobColor ? backgroundColor : blobColor); // Switch color if rotation is false
+
+                rects.push(
+                    <rect
+                        key={`${i}-${j}`}
+                        x={x}
+                        y={y}
+                        width={cellSize}
+                        height={cellSize}
+                        fill={fillColor}
+                    />
+                );
+            }
         }
-        d += 'L 100 100 L 0 100 Z';  // Close the path to fill below the wave
-        return d;
-    }, [complexity, gravity]);
+        return rects;
+    }, [complexity, blobColor, backgroundColor, gravity, rotation]);
+
+    const rects = getChessPatternPath();
 
     useEffect(() => {
-        setShapePath(getWavePath());
-    }, [getWavePath, complexity, gravity]);
+        setShapePath(getChessPatternPath());
+    }, [getChessPatternPath, complexity, gravity, blobColor, backgroundColor]);
 
     const handleShuffle = () => {
-        setRotation((prevRotation) => (prevRotation + 90) % 360);
-        setShapePath(getWavePath());
+        setRotation(!rotation);
+        setShapePath(getChessPatternPath());
     };
 
     const handleDragStop = (x, y) => {
@@ -108,23 +128,25 @@ const WaveGenerator = ({
     const downloadSVG = () => {
         const svg = `
             <svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width / 1.8} ${height / 1.8}">
-                <rect width="100%" height="100%" fill="${backgroundColor}" />
-                <g transform="
-                translate(${width / (2 * 1.8)}, ${height / (2 * 1.8)})
-                rotate(${rotation})
-                translate(${-width / (2 * 1.8)}, ${-height / (2 * 1.8)})
-                translate(${shapePosition.x}, ${shapePosition.y}) 
-                scale(${shapeSize / 100})"
-                >
-                    <path d="${shapePath}" fill="${blobColor}" stroke="none" />
-                </g>
+            <rect width="100%" height="100%" fill="${backgroundColor}" />
+            <g transform="
+            translate(${width / (2 * 1.8)}, ${height / (2 * 1.8)})
+            rotate(${rotation + 180})
+            translate(${-width / (2 * 1.8)}, ${-height / (2 * 1.8)})
+            translate(${shapePosition.x}, ${shapePosition.y})
+            scale(${shapeSize / 100})
+        ">
+                ${rects.map(rect => rect.props).map(({ x, y, width, height, fill }, index) =>
+            `<rect x="${x}" y="${y}" width="${width}" height="${height}" fill="${fill}" />`
+        ).join('')}
+        </g>
             </svg>
         `;
         const blob = new Blob([svg], { type: 'image/svg+xml' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = 'wave.svg';
+        a.download = 'chess.svg';
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
@@ -134,15 +156,18 @@ const WaveGenerator = ({
     const downloadPNG = () => {
         const svg = `
             <svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width / 1.8} ${height / 1.8}">
-                <rect width="100%" height="100%" fill="${backgroundColor}" />
-                <g transform="
-                translate(${width / (2 * 1.8)}, ${height / (2 * 1.8)})
-                rotate(${rotation})
-                translate(${-width / (2 * 1.8)}, ${-height / (2 * 1.8)})
-                translate(${shapePosition.x}, ${shapePosition.y}) 
-                scale(${shapeSize / 100})">
-                    <path d="${shapePath}" fill="${blobColor}" stroke="none" />
-                </g>
+            <rect width="100%" height="100%" fill="${backgroundColor}" />
+            <g transform="
+            translate(${width / (2 * 1.8)}, ${height / (2 * 1.8)})
+            rotate(${rotation + 180})
+            translate(${-width / (2 * 1.8)}, ${-height / (2 * 1.8)})
+            translate(${shapePosition.x}, ${shapePosition.y})
+            scale(${shapeSize / 100})
+        ">
+                ${rects.map(rect => rect.props).map(({ x, y, width, height, fill }, index) =>
+            `<rect x="${x}" y="${y}" width="${width}" height="${height}" fill="${fill}" />`
+        ).join('')}
+        </g>
             </svg>
         `;
         const canvas = document.createElement('canvas');
@@ -155,7 +180,7 @@ const WaveGenerator = ({
             const png = canvas.toDataURL('image/png');
             const a = document.createElement('a');
             a.href = png;
-            a.download = 'wave.png';
+            a.download = 'chess.png';
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
@@ -184,7 +209,9 @@ const WaveGenerator = ({
                     onDragStart={handleDragStart}
                     isDragging={isDragging}
                     rotation={rotation}
+                    rects={rects}
                 />
+
             </div>
 
             <div className='absolute inset-y-0 right-2 top-2 h-10 w-28 bg-inherit flex flex-row justify-between z-20'>
@@ -232,4 +259,4 @@ const WaveGenerator = ({
     );
 };
 
-export default WaveGenerator;
+export default ChessGenerator;

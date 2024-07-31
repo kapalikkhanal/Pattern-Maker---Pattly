@@ -1,10 +1,11 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { Rnd } from 'react-rnd';
 
-const DraggableShape = ({ shapePath, shapeColor, shapeSize, position, onDragStop, isDragging, onDragStart, rotation }) => {
+const DraggablePattern = ({ patternPath, blobColor, patternSize, position, onDragStop, isDragging, onDragStart, lineWidth, rotation }) => {
     const centerX = 50;
     const centerY = 50;
-    const lineLength = 10;
+
+    const lineLength = 20;
 
     return (
         <Rnd
@@ -14,12 +15,12 @@ const DraggableShape = ({ shapePath, shapeColor, shapeSize, position, onDragStop
             enableResizing={false}
         >
             <svg
-                width={shapeSize}
-                height={shapeSize}
+                width={patternSize}
+                height={patternSize}
                 viewBox="0 0 100 100"
                 style={{ cursor: 'move', transform: `rotate(${rotation}deg)`, transformOrigin: 'center' }}
             >
-                <path d={shapePath} fill={shapeColor} stroke="none" />
+                <path d={patternPath} stroke={blobColor} fill="none" strokeWidth={lineWidth} />
                 {isDragging && (
                     <>
                         <line x1={centerX} y1={centerY} x2={centerX - lineLength} y2={centerY} stroke="white" strokeWidth="0.1" />
@@ -33,7 +34,7 @@ const DraggableShape = ({ shapePath, shapeColor, shapeSize, position, onDragStop
     );
 };
 
-const WaveGenerator = ({
+const PatternGenerator = ({
     blobColor,
     size,
     backgroundColor,
@@ -41,58 +42,72 @@ const WaveGenerator = ({
     gravity,
     canvasSize = { width: 900, height: 675 }
 }) => {
-    const shapeSize = Math.min(1000, size * 100);
+    // console.log(gravity, size, complexity)
+    const patternSize = Math.min(600, size * 25);
     const { width, height } = canvasSize;
     const [rotation, setRotation] = useState(0);
     const containerWidth = width / 1.8;
     const containerHeight = height / 1.8;
 
-    const [shapePosition, setShapePosition] = useState({
-        x: width / 3.5 - shapeSize / 2,
-        y: height / 3.5 - shapeSize / 2
+    const [patternPosition, setPatternPosition] = useState({
+        x: width / 3.5 - patternSize / 2,
+        y: height / 3.5 - patternSize / 2
     });
-    const [shapePath, setShapePath] = useState('');
+    const [patternPath, setPatternPath] = useState('');
     const [isDragging, setIsDragging] = useState(false);
 
     const containerRef = useRef(null);
 
-    const getWavePath = useCallback(() => {
-        const waveLength = 100 / complexity;
-        let d = 'M 0 50 ';
-        for (let x = 0; x <= 100; x++) {
-            const y = 50 + gravity * Math.sin((x / waveLength) * 2 * Math.PI);
-            d += `L ${x} ${y} `;
+    const lineWidth = gravity * 3;
+    const getPatternPath = useCallback(() => {
+        const numLines = Math.floor(complexity * 5);
+        const lineLength = size * 7;
+        const spacing = lineLength / numLines;
+
+        let d = '';
+
+        // Generate vertical lines
+        for (let i = 0; i <= numLines; i++) {
+            const x = i * spacing;
+            d += `M ${x} 0 L ${x} ${lineLength} `;
         }
-        d += 'L 100 100 L 0 100 Z';  // Close the path to fill below the wave
+
+        // Generate horizontal lines
+        for (let i = 0; i <= numLines; i++) {
+            const y = i * spacing;
+            d += `M 0 ${y} L ${lineLength} ${y} `;
+        }
+
         return d;
-    }, [complexity, gravity]);
+    }, [complexity, size, gravity]);
 
     useEffect(() => {
-        setShapePath(getWavePath());
-    }, [getWavePath, complexity, gravity]);
+        setPatternPath(getPatternPath());
+    }, [getPatternPath, complexity, gravity]);
 
     const handleShuffle = () => {
-        setRotation((prevRotation) => (prevRotation + 90) % 360);
-        setShapePath(getWavePath());
+        setRotation((prevRotation) => (prevRotation + 10) % 360);
+        setPatternPath(getPatternPath());
     };
 
     const handleDragStop = (x, y) => {
-        const centerX = (containerWidth - shapeSize) / 2;
-        const centerY = (containerHeight - shapeSize) / 2;
+        const centerX = (containerWidth - patternSize) / 2;
+        const centerY = (containerHeight - patternSize) / 2;
 
-        const threshold = 16;
+        // Define the snapping threshold
+        const threshold = 4;
 
         const distanceToCenter = Math.sqrt(
             Math.pow(x - centerX, 2) + Math.pow(y - centerY, 2)
         );
 
         if (distanceToCenter < threshold) {
-            setShapePosition({
+            setPatternPosition({
                 x: centerX,
                 y: centerY
             });
         } else {
-            setShapePosition({
+            setPatternPosition({
                 x: x,
                 y: y
             });
@@ -111,12 +126,12 @@ const WaveGenerator = ({
                 <rect width="100%" height="100%" fill="${backgroundColor}" />
                 <g transform="
                 translate(${width / (2 * 1.8)}, ${height / (2 * 1.8)})
-                rotate(${rotation})
+                rotate(${rotation + 180})
                 translate(${-width / (2 * 1.8)}, ${-height / (2 * 1.8)})
-                translate(${shapePosition.x}, ${shapePosition.y}) 
-                scale(${shapeSize / 100})"
+                translate(${patternPosition.x}, ${patternPosition.y}) 
+                scale(${patternSize / 100})"
                 >
-                    <path d="${shapePath}" fill="${blobColor}" stroke="none" />
+                    <path d="${patternPath}" stroke="${blobColor}" fill="none" stroke-width="${lineWidth}" />
                 </g>
             </svg>
         `;
@@ -124,7 +139,7 @@ const WaveGenerator = ({
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = 'wave.svg';
+        a.download = 'pattern.svg';
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
@@ -137,11 +152,12 @@ const WaveGenerator = ({
                 <rect width="100%" height="100%" fill="${backgroundColor}" />
                 <g transform="
                 translate(${width / (2 * 1.8)}, ${height / (2 * 1.8)})
-                rotate(${rotation})
+                rotate(${rotation + 180})
                 translate(${-width / (2 * 1.8)}, ${-height / (2 * 1.8)})
-                translate(${shapePosition.x}, ${shapePosition.y}) 
-                scale(${shapeSize / 100})">
-                    <path d="${shapePath}" fill="${blobColor}" stroke="none" />
+                translate(${patternPosition.x}, ${patternPosition.y}) 
+                scale(${patternSize / 100})"
+                >
+                    <path d="${patternPath}" stroke="${blobColor}" fill="none" stroke-width="${lineWidth}"/>
                 </g>
             </svg>
         `;
@@ -155,7 +171,7 @@ const WaveGenerator = ({
             const png = canvas.toDataURL('image/png');
             const a = document.createElement('a');
             a.href = png;
-            a.download = 'wave.png';
+            a.download = 'pattern.png';
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
@@ -175,14 +191,15 @@ const WaveGenerator = ({
                 className="relative flex justify-center items-center rounded-lg border overflow-hidden z-50"
                 style={{ backgroundColor, width: containerWidth, height: containerHeight }}
             >
-                <DraggableShape
-                    shapePath={shapePath}
-                    shapeColor={blobColor}
-                    shapeSize={shapeSize}
-                    position={shapePosition}
+                <DraggablePattern
+                    patternPath={patternPath}
+                    blobColor={blobColor}
+                    patternSize={patternSize}
+                    position={patternPosition}
                     onDragStop={handleDragStop}
                     onDragStart={handleDragStart}
                     isDragging={isDragging}
+                    lineWidth={lineWidth}
                     rotation={rotation}
                 />
             </div>
@@ -232,4 +249,4 @@ const WaveGenerator = ({
     );
 };
 
-export default WaveGenerator;
+export default PatternGenerator;

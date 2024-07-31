@@ -4,6 +4,9 @@ import BlobGenerator from './components/blobGenerator';
 import WaveGenerator from './components/waveGenerator';
 import RightDiv from './components/rightDiv';
 import BubbleGenerator from './components/bubbleGenerator';
+import PatternGenerator from './components/gridGenerator';
+import LineGenerator from './components/lineGenerator';
+import ChessGenerator from './components/chessGenerator';
 
 export default function Home() {
   const [currentComponent, setCurrentComponent] = useState('blob');
@@ -66,6 +69,42 @@ export default function Home() {
         />
       );
     }
+    else if (currentComponent === 'grid') {
+      return (
+        <PatternGenerator
+          blobColor={blobColor}
+          size={waveSize * 4}
+          backgroundColor={backgroundColor}
+          complexity={complexity * 10}
+          gravity={gravity / 100}
+          canvasSize={canvasSize}
+        />
+      );
+    }
+    else if (currentComponent === 'line') {
+      return (
+        <LineGenerator
+          blobColor={blobColor}
+          size={waveSize / 1.2}
+          backgroundColor={backgroundColor}
+          complexity={complexity * 10}
+          gravity={gravity}
+          canvasSize={canvasSize}
+        />
+      );
+    }
+    else if (currentComponent === 'chess') {
+      return (
+        <ChessGenerator
+          blobColor={blobColor}
+          size={waveSize*4}
+          backgroundColor={backgroundColor}
+          complexity={complexity*5}
+          gravity={gravity/1.15}
+          canvasSize={canvasSize}
+        />
+      );
+    }
     return null;
   };
 
@@ -75,6 +114,9 @@ export default function Home() {
         onBlobClick={() => setCurrentComponent('blob')}
         onWaveClick={() => setCurrentComponent('wave')}
         onBubbleClick={() => setCurrentComponent('bubble')}
+        onGridClick={() => setCurrentComponent('grid')}
+        onLineClick={() => setCurrentComponent('line')}
+        onChessClick={() => setCurrentComponent('chess')}
       />
 
       {renderComponent()}
