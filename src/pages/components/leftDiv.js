@@ -43,9 +43,9 @@ const LeftDiv = ({ onBlobClick, onWaveClick, onBubbleClick, onGridClick, onLineC
                             <input id="option-2" name="option" type="radio" />
                             <label className="option" for="option-2" data-txt="Json Formatter"></label>
                         </div>
-                        <div title="option-3">
+                        <div title="option-3" onClick={() => { router.push('/jsonDiff') }}>
                             <input id="option-3" name="option" type="radio" />
-                            <label className="option" for="option-3" data-txt="Other Tools"></label>
+                            <label className="option" for="option-3" data-txt="Json Diffrentiator"></label>
                         </div>
                     </div>
                 </div>
@@ -56,15 +56,15 @@ const LeftDiv = ({ onBlobClick, onWaveClick, onBubbleClick, onGridClick, onLineC
 
                     {/* Json Beautifier  */}
                     <div className="mb-2 w-full h-fit relative hover:border-2 rounded-xl" onClick={onBlobClick}>
-                        <button className='jsonButton'>
+                        <button className='jsonButton' onClick={() => { router.push('/jsonFormatter') }}>
                             <span className='text-sm'>Beautifier</span>
                         </button>
                     </div>
 
-                    {/* Json Beautifier  */}
+                    {/* Json Diffrentiator  */}
                     <div className="mb-2 w-full h-fit rounded-xl" onClick={onBlobClick}>
-                        <button className='jsonButton'>
-                            <span className='text-sm'>Beautifier</span>
+                        <button className='jsonButton' onClick={() => { router.push('/jsonDiff') }}>
+                            <span className='text-sm'>Differentiator</span>
                         </button>
                     </div>
 

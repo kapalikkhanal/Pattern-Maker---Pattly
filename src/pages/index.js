@@ -1,12 +1,12 @@
 import { useState } from 'react';
 import LeftDiv from './components/leftDiv';
-import BlobGenerator from './components/blobGenerator';
-import WaveGenerator from './components/waveGenerator';
+import BlobGenerator from './components/pattern/blobGenerator';
+import WaveGenerator from './components/pattern/waveGenerator';
 import RightDiv from './components/rightDiv';
-import BubbleGenerator from './components/bubbleGenerator';
-import PatternGenerator from './components/gridGenerator';
-import LineGenerator from './components/lineGenerator';
-import ChessGenerator from './components/chessGenerator';
+import BubbleGenerator from './components/pattern/bubbleGenerator';
+import PatternGenerator from './components/pattern/gridGenerator';
+import LineGenerator from './components/pattern/lineGenerator';
+import ChessGenerator from './components/pattern/chessGenerator';
 
 export default function Home() {
   const [currentComponent, setCurrentComponent] = useState('blob');
