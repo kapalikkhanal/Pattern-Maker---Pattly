@@ -28,7 +28,7 @@ You can generate various patterns using the tools provided in the application:
 - Bubbles: Create bubble patterns with varying sizes and colors.
 - Chess Patterns: Generate chessboard-like patterns with customizable colors for the squares.
 
-The generated patterns can be saved in both PNG and SVG formats.
+### Pattern Generator
 
 - JSON Tools
 - JSON Beautifier: Format and beautify JSON data.
@@ -38,23 +38,25 @@ The generated patterns can be saved in both PNG and SVG formats.
 - JSON to HTML: Convert JSON data to HTML table format.
 - JSON to CSV: Convert JSON data to CSV format.
 
+The generated patterns can be saved in both PNG and SVG formats.
+
 ## UI
 
-![Pattern Generator](/client/public/ui.PNG)
+![Pattern Generator](/public/ui.PNG)
 *Pattern generator UI.*
 
-![JSON Tools](/client/public/json.PNG)
+![JSON Tools](/public/json.PNG)
 *JSON Tools UI.*
 
 ## Exmaples
 
-![Blob](/client/public/blob.png)
+![Blob](/public/blob.png)
 *Blob*
 
-![Wave](/client/public/wave.png)
+![Wave](/public/wave.png)
 *Wave*
 
-![Bubble](/client/public/bubble.png)
+![Bubble](/public/bubble.png)
 *Bubble*
 
 
