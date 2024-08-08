@@ -77,7 +77,7 @@ const RightDiv = ({
     };
 
     return (
-        <div className="w-1/3 bg-[#242424] p-4 max-h-screen">
+        <div className="w-96 bg-[#242424] p-4 h-screen">
             <h2 className="text-lg mb-4 font-semibold">Configurations</h2>
             {/* Settings  */}
             <div className='h-5/6 overflow-y-scroll scrollbar-hide bg-[#383434] p-2 rounded-2xl'>
@@ -203,6 +203,10 @@ const RightDiv = ({
                         className="w-full custom-range"
                     />
                 </div>
+            </div>
+
+            <div>
+                <h2 className="text-md text-center font-bold px-4 py-2 text-white">A product by Ka Pa Lik<span className='text-red-600 text-xl pl-1'>.</span></h2>
             </div>
         </div>
     );

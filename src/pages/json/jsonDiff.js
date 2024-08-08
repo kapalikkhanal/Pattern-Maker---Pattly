@@ -1,10 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
-import LeftDiv from './components/leftDiv';
+import LeftDiv from '../components/leftDiv';
 
 const JsonDifferentiator = () => {
     const [inputLeft, setInputLeft] = useState('');
     const [inputRight, setInputRight] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
+    const [tooltipText, setTooltipText] = useState('Copy');
+    const [tooltipClearText, setTooltipClearText] = useState('Clear');
+    const tooltipRef = useRef(null);
+    const tooltipClearRef = useRef(null);
     const leftInputRef = useRef(null);
     const rightInputRef = useRef(null);
 
@@ -43,6 +47,24 @@ const JsonDifferentiator = () => {
             target.current.scrollTop = source.current.scrollTop;
             target.current.scrollLeft = source.current.scrollLeft;
         }
+    };
+
+    const handleCopy = () => {
+        navigator.clipboard.writeText(inputRight).then(() => {
+            setTooltipText('Copied!');
+            setTimeout(() => {
+                setTooltipText('Copy');
+            }, 2000);
+        });
+    };
+
+    const handleClear = () => {
+        setTooltipClearText('Cleared.');
+        setInputLeft('');
+        setInputRight('');
+        setTimeout(() => {
+            setTooltipClearText('Clear');
+        }, 2000);
     };
 
     useEffect(() => {
@@ -90,9 +112,26 @@ const JsonDifferentiator = () => {
                                     onInput={(e) => setInputLeft(e.currentTarget.textContent)}
                                     style={{ whiteSpace: 'pre-wrap', caretColor: 'white' }}
                                 ></div>
+
+                                <div className='absolute top-1.5 right-14'>
+                                    <button className="copy" onClick={handleClear}>
+                                        <span ref={tooltipClearRef} className="tooltip">{tooltipClearText}</span>
+                                        <span>
+                                            <svg style={{ enableBackground: 'new 0 0 512 512' }} fill="currentColor" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" className='clipboard'>
+                                                <path d="M18.8,16l5.5-5.5c0.8-0.8,0.8-2,0-2.8l0,0C24,7.3,23.5,7,23,7c-0.5,0-1,0.2-1.4,0.6L16,13.2l-5.5-5.5 c-0.8-0.8-2.1-0.8-2.8,0C7.3,8,7,8.5,7,9.1s0.2,1,0.6,1.4l5.5,5.5l-5.5,5.5C7.3,21.9,7,22.4,7,23c0,0.5,0.2,1,0.6,1.4 C8,24.8,8.5,25,9,25c0.5,0,1-0.2,1.4-0.6l5.5-5.5l5.5,5.5c0.8,0.8,2.1,0.8,2.8,0c0.8-0.8,0.8-2.1,0-2.8L18.8,16z"></path>
+                                            </svg>
+                                            <svg style={{ enableBackground: 'new 0 0 512 512' }} viewBox="0 0 24 24" height="18" width="18" xmlns="http://www.w3.org/2000/svg" className="checkmark">
+                                                <g>
+                                                    <path fill="currentColor" d="M9.707 19.121a.997.997 0 0 1-1.414 0l-5.646-5.647a1.5 1.5 0 0 1 0-2.121l.707-.707a1.5 1.5 0 0 1 2.121 0L9 14.171l9.525-9.525a1.5 1.5 0 0 1 2.121 0l.707.707a1.5 1.5 0 0 1 0 2.121z"></path>
+                                                </g>
+                                            </svg>
+                                        </span>
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
+
 
                     <div className='w-2/4 flex-grow bg-white/20 pt-2'>
                         <div className='relative h-[95%] ml-10 px-2 pr-6'>
@@ -106,6 +145,24 @@ const JsonDifferentiator = () => {
                                     onInput={(e) => setInputRight(e.currentTarget.textContent)}
                                     style={{ whiteSpace: 'pre-wrap', caretColor: 'white' }}
                                 ></div>
+
+                                <div className='absolute top-1.5 right-8'>
+                                    <button className="copy" onClick={handleCopy}>
+                                        <span ref={tooltipRef} className="tooltip">{tooltipText}</span>
+                                        <span>
+                                            <svg style={{ enableBackground: 'new 0 0 512 512' }} viewBox="0 0 6.35 6.35" height="20" width="20" xmlns="http://www.w3.org/2000/svg" className="clipboard">
+                                                <g>
+                                                    <path fill="currentColor" d="M2.43.265c-.3 0-.548.236-.573.53h-.328a.74.74 0 0 0-.735.734v3.822a.74.74 0 0 0 .735.734H4.82a.74.74 0 0 0 .735-.734V1.529a.74.74 0 0 0-.735-.735h-.328a.58.58 0 0 0-.573-.53zm0 .529h1.49c.032 0 .049.017.049.049v.431c0 .032-.017.049-.049.049H2.43c-.032 0-.05-.017-.05-.049V.843c0-.032.018-.05.05-.05zm-.901.53h.328c.026.292.274.528.573.528h1.49a.58.58 0 0 0 .573-.529h.328a.2.2 0 0 1 .206.206v3.822a.2.2 0 0 1-.206.205H1.53a.2.2 0 0 1-.206-.205V1.529a.2.2 0 0 1 .206-.206z"></path>
+                                                </g>
+                                            </svg>
+                                            <svg style={{ enableBackground: 'new 0 0 512 512' }} viewBox="0 0 24 24" height="18" width="18" xmlns="http://www.w3.org/2000/svg" className="checkmark">
+                                                <g>
+                                                    <path fill="currentColor" d="M9.707 19.121a.997.997 0 0 1-1.414 0l-5.646-5.647a1.5 1.5 0 0 1 0-2.121l.707-.707a1.5 1.5 0 0 1 2.121 0L9 14.171l9.525-9.525a1.5 1.5 0 0 1 2.121 0l.707.707a1.5 1.5 0 0 1 0 2.121z"></path>
+                                                </g>
+                                            </svg>
+                                        </span>
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>

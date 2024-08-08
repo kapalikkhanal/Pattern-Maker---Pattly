@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import LeftDiv from './components/leftDiv';
+import LeftDiv from '../components/leftDiv';
 
 const JsonFormatter = () => {
   const [input, setInput] = useState('');
@@ -62,7 +62,7 @@ const JsonFormatter = () => {
       } else if (/null/.test(match)) {
         cls = 'null';
       }
-      return `<span class="${cls}">${match}</span>`;
+      return `<span className="${cls}">${match}</span>`;
     });
   };
 
